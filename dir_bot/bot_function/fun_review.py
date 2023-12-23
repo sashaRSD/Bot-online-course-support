@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram import types
 from dir_bot.functions import menu, name_button, google_api_error
 from dir_bot.create_bot import dp, bot
-from dir_google import google_sheets
+from dir_google import sheet_review
 import gspread.exceptions
 
 
@@ -28,7 +28,7 @@ async def support(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     await callback.answer()
     try:
-        lessons = await google_sheets.get_lessons_support()
+        lessons = await sheet_review.get_lessons_support()
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
         return
@@ -106,7 +106,7 @@ async def send_review(message, state: FSMContext):
     await state.finish()
     await bot.delete_message(chat_id=user_id, message_id=del_message_id_review)
     try:
-        await google_sheets.send_lessons_support(username_student, lessons_name, mark_id, review_text)
+        await sheet_review.send_lessons_support(username_student, lessons_name, mark_id, review_text)
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
         return
