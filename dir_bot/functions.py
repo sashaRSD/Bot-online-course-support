@@ -11,7 +11,7 @@ button_menu = InlineKeyboardMarkup()\
 
 
 async def menu(call_menu_user):
-    await bot.send_message(call_menu_user, f'Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
+    await bot.send_message(call_menu_user, 'Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
 
 
 async def google_api_error(user_id_error):

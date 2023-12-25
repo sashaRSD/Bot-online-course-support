@@ -26,17 +26,18 @@ async def menu_callback(callback: types.CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(text_contains='feedback')
 async def support(callback: types.CallbackQuery):
     user_id = callback.from_user.id
+    await bot.delete_message(chat_id=user_id, message_id=callback.message.message_id)
     await callback.answer()
     try:
         lessons = await sheet_review.get_lessons_support()
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
+        await menu(user_id)
         return
     button_lessons = InlineKeyboardMarkup()
     for i, i_lesson in enumerate(lessons, 1):
         button_lessons.add(InlineKeyboardButton(text=i_lesson, callback_data=f"LessonNum_{i}"))
     button_lessons.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
-    await bot.delete_message(chat_id=user_id, message_id=callback.message.message_id)
     await bot.send_message(user_id, "Выберите урок, который хотите оценить:", reply_markup=button_lessons)
 
 
@@ -107,10 +108,10 @@ async def send_review(message, state: FSMContext):
     await bot.delete_message(chat_id=user_id, message_id=del_message_id_review)
     try:
         await sheet_review.send_lessons_support(username_student, lessons_name, mark_id, review_text)
+        await bot.send_message(user_id, f"Вы оценили урок -  {lessons_name} на оценку {mark_id}.\n"
+                                        f"Благодарим вас за оставленный отзыв!")
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
-        return
-    await bot.send_message(user_id, f"Вы оценили урок -  {lessons_name} на оценку {mark_id}.\nБлагодарим вас за оставленный отзыв!")
     await menu(user_id)
 
 
