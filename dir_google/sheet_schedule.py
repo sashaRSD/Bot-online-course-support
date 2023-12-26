@@ -3,6 +3,7 @@ from datetime import datetime
 
 item_time_lesson = '⏰'
 
+
 async def get_schedule(last_element=0):
     lessons_name = list(filter(None, await get_lessons_inf('name')))
     lessons_time = list(filter(None, await get_lessons_inf('time')))

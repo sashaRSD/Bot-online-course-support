@@ -9,7 +9,7 @@ get_value = 4
 
 
 @dp.callback_query_handler(lambda fun: fun.data in ['schedule', 'schedule_mini'])
-async def enter_menu(callback: types.CallbackQuery):
+async def schedule_mini(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     message_id = callback.message.message_id
     await callback.answer()
@@ -33,7 +33,7 @@ async def enter_menu(callback: types.CallbackQuery):
 
 
 @dp.callback_query_handler(text_contains='schedule_all')
-async def enter_menu(callback: types.CallbackQuery):
+async def schedule_all(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     message_id = callback.message.message_id
     await callback.answer()

@@ -6,7 +6,7 @@ import gspread.exceptions
 
 
 @dp.callback_query_handler(text_contains='myprogress')
-async def enter_menu(callback: types.CallbackQuery):
+async def myprogress_menu(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     await callback.answer()
     try:
