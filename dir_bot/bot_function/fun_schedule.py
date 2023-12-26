@@ -28,7 +28,7 @@ async def enter_menu(callback: types.CallbackQuery):
         await bot.delete_message(chat_id=user_id, message_id=message_id)
         message_id = (await bot.send_message(user_id, answer_text, parse_mode='HTML')).message_id
         await menu(user_id)
-    if answer_text.count("⏰") == get_value:
+    if answer_text.count(sheet_schedule.item_time_lesson) == get_value:
         await bot.edit_message_reply_markup(chat_id=user_id, message_id=message_id, reply_markup=button_schedule_all)
 
 
@@ -47,5 +47,5 @@ async def enter_menu(callback: types.CallbackQuery):
     button_schedule_mini = (InlineKeyboardMarkup()
                             .add((InlineKeyboardButton(text='Меньше', callback_data='schedule_mini'))))
     await bot.edit_message_text(chat_id=user_id, message_id=message_id, text=answer_text, parse_mode='HTML')
-    if answer_text.count("⏰") > get_value:
+    if answer_text.count(sheet_schedule.item_time_lesson) > get_value:
         await bot.edit_message_reply_markup(chat_id=user_id, message_id=message_id, reply_markup=button_schedule_mini)
