@@ -19,4 +19,4 @@ async def get_progress(my_username, my_id):
                     progress_information.append('❌')
                 progress_information.append(f' {all_table[0][num_homework]}: {abs(mark_homework)}/10\n')
             return [' '.join(progress_information)]
-    return 'Ой, а вас нет в ведомости ДЗ. Обратитесь к администратору...'
+    return ['Ой, а вас нет в ведомости ДЗ. Обратитесь к администратору...']
