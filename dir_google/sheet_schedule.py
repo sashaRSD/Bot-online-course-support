@@ -1,8 +1,6 @@
 from dir_google.google_sheets import get_lessons_inf
 from datetime import datetime
 
-item_time_lesson = '⏰'
-
 
 async def get_schedule(last_element=0):
     lessons_name = list(filter(None, await get_lessons_inf('name')))
@@ -17,10 +15,10 @@ async def get_schedule(last_element=0):
             else:
                 last_element = len(lessons_date)
             for elem in range(last_lesson, last_element):
-                schedule.append(f'{item_time_lesson} {lessons_date[elem]} в {lessons_time[elem]}\n'
+                schedule.append(f'⏰ {lessons_date[elem]} в {lessons_time[elem]}\n'
                                 f'📚 {lessons_name[elem][lessons_name[elem].find(".")+1:]}')
             schedule.append('</b>')
-            return '\n\n'.join(schedule)
+            return ['\n\n'.join(schedule),  len(schedule)-2]
         else:
             return 'Занятия закончились 😉'
     else:

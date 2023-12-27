@@ -9,6 +9,7 @@ import gspread.exceptions
 @dp.callback_query_handler(lambda lessons: lessons.data == 'lessons')
 async def menu_module(callback: types.CallbackQuery):
     user_id = callback.from_user.id
+    await bot.delete_message(chat_id=user_id, message_id=callback.message.message_id)
     await callback.answer()
     try:
         answer_text = await sheet_lessons.get_module_lesson()
@@ -19,7 +20,6 @@ async def menu_module(callback: types.CallbackQuery):
                                parse_mode='HTML', reply_markup=button_module)
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
-    await bot.delete_message(chat_id=user_id, message_id=callback.message.message_id)
     await menu(user_id)
 
 
