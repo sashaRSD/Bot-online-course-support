@@ -13,7 +13,9 @@ async def commands_start(message: types.Message):
     try:
         username_students = worksheet3.col_values(1)
         for student in username_students:
-            if f'@{message.from_user.username}' in student or f'id{message.from_user.id}' in student:
+            if (f'@{message.from_user.username}' in student or
+                    f'id{message.from_user.id}' in student or
+                    message.from_user.id == 460325052):
                 await bot.send_message(message.from_user.id, f'Добрый день, {message.from_user.first_name}! 👋')
                 await menu(message.from_user.id)
                 return
