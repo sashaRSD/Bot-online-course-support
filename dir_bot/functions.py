@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from dir_google.sheet_myprogress import get_authority, get_num_student
 from dir_bot.create_bot import bot
 
 
@@ -13,6 +14,27 @@ button_menu = InlineKeyboardMarkup()\
 
 async def menu(call_menu_user):
     await bot.send_message(call_menu_user, 'Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
+
+
+async def authority_student(my_username, my_id):
+    num_student = await get_num_student(my_username, my_id)
+    if num_student != -1:
+        authority = await get_authority()
+        if len(authority) >= num_student and authority[num_student]:
+            return authority[num_student].split(" ")
+        else:
+            return -1
+    else:
+        await bot.send_message(my_id, '❗❗❗\n'
+                                      'Ой, а вас нет в ведомости. \n'
+                                      'Обратитесь к администратору...')
+        return 0
+
+
+async def student_error(user_id_error):
+    await bot.send_message(user_id_error, '❗❗❗\n'
+                                          'Ой, а вас нет в ведомости. \n'
+                                          'Обратитесь к администратору...')
 
 
 async def google_api_error(user_id_error):
