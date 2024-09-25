@@ -17,7 +17,7 @@ async def commands_start(message: types.Message):
                     f'id{message.from_user.id}' in student or
                     message.from_user.id == 460325052):
                 await bot.send_message(message.from_user.id, f'Добрый день, {message.from_user.first_name}! 👋')
-                await menu(message.from_user.id)
+                await menu(message.from_user.username, message.from_user.id)
                 return
         await bot.send_message(message.from_user.id, 'Ой, мы вас не нашли в списках студентов...\n'
                                                      'Обратитесь к администратору 😉')
@@ -41,8 +41,9 @@ async def all_message(message):
 async def error_delete_2day(update, exception: MessageCantBeDeleted):
     chat_id = update['callback_query']['from']['id']
     message_id = update['callback_query']['message']['message_id']
+    username = update['callback_query']['message']['chat']['username']
     await bot.edit_message_text(text='<< Меню обновлено >>', chat_id=chat_id, message_id=message_id)
-    await menu(chat_id)
+    await menu(username, chat_id)
     return True
 
 

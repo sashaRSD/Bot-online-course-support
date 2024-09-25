@@ -57,7 +57,7 @@ async def schedule(callback: types.CallbackQuery):
                 await bot.send_message(user_id, f"{schedule_text}", parse_mode='HTML')
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
-    await menu(user_id)
+    await menu(callback.message.chat.username, user_id)
 
 
 @dp.callback_query_handler(text_contains='schedule_all')

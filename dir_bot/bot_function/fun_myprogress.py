@@ -31,4 +31,4 @@ async def my_progress_menu(callback: types.CallbackQuery):
             await student_error(user_id)
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
-    await menu(user_id)
+    await menu(callback.message.chat.username, user_id)

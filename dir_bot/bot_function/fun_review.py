@@ -20,7 +20,7 @@ async def menu_callback(callback: types.CallbackQuery, state: FSMContext):
     if await state.get_state():
         await state.finish()
     await bot.delete_message(chat_id=callback.from_user.id, message_id=callback.message.message_id)
-    await menu(callback.from_user.id)
+    await menu(callback.message.chat.username, callback.from_user.id)
 
 
 @dp.callback_query_handler(text_contains='feedback')
@@ -32,7 +32,7 @@ async def support(callback: types.CallbackQuery):
         lessons = await sheet_review.get_lessons_support()
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
-        await menu(user_id)
+        await menu(callback.message.chat.username, user_id)
         return
     button_lessons = InlineKeyboardMarkup()
     for i, i_lesson in enumerate(lessons, 1):
@@ -112,7 +112,7 @@ async def send_review(message, state: FSMContext):
                                         f"Благодарим вас за оставленный отзыв! ❤️",  parse_mode='HTML')
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
-    await menu(user_id)
+    await menu(message.from_user.username, user_id)
 
 
 async def is_callback(name_callback, data):

@@ -12,8 +12,11 @@ button_menu = InlineKeyboardMarkup()\
     .add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
 
 
-async def menu(call_menu_user):
-    await bot.send_message(call_menu_user, 'Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
+async def menu(username, call_menu_user_id):
+    tmp_button_menu = button_menu
+    if await authority_student(username, call_menu_user_id) == -1:
+        tmp_button_menu.add(InlineKeyboardButton(text='Перейти к материалам.', callback_data='qwhdhvadsjhdvfjkhd'))
+    await bot.send_message(call_menu_user_id, 'Пожалуйста, укажите что вас интересует:', reply_markup=tmp_button_menu)
 
 
 async def authority_student(my_username, my_id):
