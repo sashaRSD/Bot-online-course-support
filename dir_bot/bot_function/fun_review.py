@@ -14,19 +14,17 @@ class FSMClient(StatesGroup):
     message_id_review = State()
 
 
-@dp.callback_query_handler(state="*", text_contains='menu')
+@dp.callback_query_handler(lambda back: back.data in 'menu', state="*")
 async def menu_callback(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     if await state.get_state():
         await state.finish()
-    await bot.delete_message(chat_id=callback.from_user.id, message_id=callback.message.message_id)
-    await menu(callback.message.chat.username, callback.from_user.id)
+    await menu(callback.message.chat.username, callback.from_user.id, callback.message.message_id)
 
 
 @dp.callback_query_handler(text_contains='feedback')
 async def support(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    await bot.delete_message(chat_id=user_id, message_id=callback.message.message_id)
     await callback.answer()
     try:
         lessons = await sheet_review.get_lessons_support()
@@ -38,7 +36,8 @@ async def support(callback: types.CallbackQuery):
     for i, i_lesson in enumerate(lessons, 1):
         button_lessons.add(InlineKeyboardButton(text=i_lesson, callback_data=f"LessonNum_{i}"))
     button_lessons.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
-    await bot.send_message(user_id, "Выберите урок, который хотите оценить:", reply_markup=button_lessons)
+    await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
+                                text="Выберите урок, который хотите оценить:", reply_markup=button_lessons)
 
 
 @dp.callback_query_handler(state="*", text_contains='LessonNum')
@@ -62,8 +61,8 @@ async def mark(callback: types.CallbackQuery, state: FSMContext):
     button_mark.row(mark1, mark2, mark3, mark4, mark5)
     button_mark.add((InlineKeyboardButton(text='Изменить урок', callback_data='feedback')))
     button_mark.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
-    await bot.delete_message(chat_id=user_id, message_id=callback.message.message_id)
-    await bot.send_message(user_id, f'Урок: {lesson_name} \nПоставьте оценку от 1 до 5:', reply_markup=button_mark)
+    await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
+                                text=f'Урок: {lesson_name} \nПоставьте оценку от 1 до 5:', reply_markup=button_mark)
 
 
 @dp.callback_query_handler(text_contains='ReviewMark')
@@ -78,15 +77,16 @@ async def review(callback: types.CallbackQuery, state: FSMContext):
     button_review.add((InlineKeyboardButton(text='Отправить без отзыва', callback_data='SendReview')))
     button_review.add((InlineKeyboardButton(text='Изменить оценку', callback_data='LessonNum')))
     button_review.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
-    await bot.delete_message(chat_id=user_id, message_id=callback.message.message_id)
-    message_delete = await bot.send_message(user_id, f"Вы поставили оценку {mark_id} \nНапишите отзыв:", reply_markup=button_review)
+    message_edit = await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
+                                                 text=f"Вы поставили оценку {mark_id} \nНапишите отзыв:",
+                                                 reply_markup=button_review)
     await FSMClient.lessons_support.set()
     async with state.proxy() as data:
         data['lessons_support'] = lesson_name
         await FSMClient.next()
         data['mark_support'] = mark_id
         await FSMClient.next()
-        data['message_id_review'] = message_delete.message_id
+        data['message_id_review'] = message_edit.message_id
 
 
 @dp.callback_query_handler(state=FSMClient.message_id_review, text_contains='SendReview')

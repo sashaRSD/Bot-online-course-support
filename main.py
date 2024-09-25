@@ -36,6 +36,11 @@ async def all_message(message):
     await bot.delete_message(chat_id=user_id, message_id=text.message_id)
 
 
+@dp.callback_query_handler(lambda back: back.data in 'back_to_menu')
+async def all_message(callback: types.CallbackQuery):
+    await menu(callback.message.chat.username, callback.from_user.id, callback.message.message_id)
+
+
 @dp.errors_handler(exception=MessageCantBeDeleted)
 async def error_delete_2day(update, exception: MessageCantBeDeleted):
     chat_id = update['callback_query']['from']['id']

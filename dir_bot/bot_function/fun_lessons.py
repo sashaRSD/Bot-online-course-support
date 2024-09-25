@@ -6,7 +6,7 @@ from aiogram import types
 import gspread.exceptions
 
 
-@dp.callback_query_handler(lambda lessons: lessons.data in ['lessons', 'lessons_cansel'])
+@dp.callback_query_handler(lambda lessons: lessons.data in 'lessons')
 async def menu_module(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     await callback.answer()
@@ -18,14 +18,10 @@ async def menu_module(callback: types.CallbackQuery):
             for i, name in enumerate(module_name, 1):
                 if authority == -1 or str(i) in authority:
                     button_module.add((InlineKeyboardButton(text=name, callback_data=f'lessons_module_{i - 1}')))
-            if callback.data == 'lessons':
-                await bot.send_message(user_id, '<b>🗂 Информация о занятиях </b>',
-                                       parse_mode='HTML', reply_markup=button_module)
-            elif callback.data == 'lessons_cansel':
-                await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
-                                            text='<b>🗂 Информация о занятиях </b>',
-                                            parse_mode='HTML', reply_markup=button_module)
-
+            button_module.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
+            await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
+                                        text='<b>🗂 Информация о занятиях </b>',
+                                        parse_mode='HTML', reply_markup=button_module)
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
 
@@ -40,7 +36,8 @@ async def menu_lessons(callback: types.CallbackQuery):
         button_lessons = InlineKeyboardMarkup()
         for i, name in enumerate(module_inf[1]):
             button_lessons.add((InlineKeyboardButton(text=name, callback_data=f'lessons_name_{index_module_name}_{i}')))
-        button_lessons.add((InlineKeyboardButton(text='Назад', callback_data=f'lessons_cansel')))
+        button_lessons.add((InlineKeyboardButton(text='Назад', callback_data=f'lessons')))
+        button_lessons.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                     text=f'📂 <b>{module_inf[0]}</b>', parse_mode='HTML', reply_markup=button_lessons)
     except gspread.exceptions.APIError:
@@ -68,7 +65,8 @@ async def get_lesson(callback: types.CallbackQuery):
         menu_cansel = (InlineKeyboardMarkup()
                        .add((InlineKeyboardButton(text='Другой урок',
                                                   callback_data=f'lessons_module_{index_module_name}')))
-                       .add((InlineKeyboardButton(text='Другой модуль', callback_data=f'lessons_cansel'))))
+                       .add((InlineKeyboardButton(text='Другой модуль', callback_data=f'lessons')))
+                       .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                     text=f"{data_lesson}",
                                     parse_mode='HTML', disable_web_page_preview=True, reply_markup=menu_cansel)

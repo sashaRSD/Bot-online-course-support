@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from dir_bot.functions import menu, google_api_error, authority_student
+from dir_bot.functions import google_api_error, authority_student
 from dir_bot.create_bot import bot, dp
 from dir_google.google_sheets import get_module_name, get_module_inf
 from aiogram import types
@@ -8,6 +8,8 @@ import gspread.exceptions
 
 max_get_value = 4
 message_wait = "⏳ Получаю расписание, подождите пожалуйста ⏳"
+button_back = (InlineKeyboardMarkup()
+               .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
 
 
 async def module_cul(authority, local_max_value):
@@ -43,7 +45,6 @@ async def module_cul(authority, local_max_value):
 @dp.callback_query_handler(lambda fun: fun.data == 'schedule')
 async def schedule(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    await bot.delete_message(chat_id=user_id, message_id=callback.message.message_id)
     wait_message = await bot.send_message(user_id, message_wait)
     await callback.answer()
     try:
@@ -51,15 +52,17 @@ async def schedule(callback: types.CallbackQuery):
         if authority:
             schedule_text = await module_cul(authority, max_get_value)
             button_schedule_all = (InlineKeyboardMarkup()
-                                   .add((InlineKeyboardButton(text='Показать всё', callback_data='schedule_all'))))
+                                   .add((InlineKeyboardButton(text='Показать всё', callback_data='schedule_all')))
+                                   .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
             if schedule_text.count('⏰') == max_get_value:
-                await bot.send_message(user_id, f"{schedule_text}\n\n\n <i>⬇️Ещё⬇️</i>",
-                                       parse_mode='HTML', reply_markup=button_schedule_all)
+                await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
+                                            text= f"{schedule_text}\n\n\n <i>⬇️Ещё⬇️</i>",
+                                            parse_mode='HTML', reply_markup=button_schedule_all)
             else:
-                await bot.send_message(user_id, f"{schedule_text}", parse_mode='HTML')
+                await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
+                                            text=f"{schedule_text}", parse_mode='HTML', reply_markup=button_back)
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
-    await menu(callback.message.chat.username, user_id)
     await bot.delete_message(chat_id=user_id, message_id=wait_message.message_id)
 
 
@@ -75,14 +78,15 @@ async def schedule_all(callback: types.CallbackQuery):
         if authority:
             schedule_text = await module_cul(authority, 0)
             button_schedule_mini = (InlineKeyboardMarkup()
-                                    .add((InlineKeyboardButton(text='Свернуть', callback_data='schedule_mini'))))
+                                    .add((InlineKeyboardButton(text='Свернуть', callback_data='schedule_mini')))
+                                    .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
             if schedule_text.count('⏰') > max_get_value:
                 await bot.edit_message_text(chat_id=user_id, message_id=message_id,
                                             text=f"{schedule_text}\n",
                                             parse_mode='HTML', reply_markup=button_schedule_mini)
             else:
                 await bot.edit_message_text(chat_id=user_id, message_id=message_id,
-                                            text=f"{schedule_text}", parse_mode='HTML')
+                                            text=f"{schedule_text}", parse_mode='HTML', reply_markup=button_back)
 
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
@@ -101,14 +105,15 @@ async def schedule_mini(callback: types.CallbackQuery):
         if authority:
             schedule_text = await module_cul(authority, max_get_value)
             button_schedule_all = (InlineKeyboardMarkup()
-                                   .add((InlineKeyboardButton(text='Показать всё', callback_data='schedule_all'))))
+                                   .add((InlineKeyboardButton(text='Показать всё', callback_data='schedule_all')))
+                                   .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
             if schedule_text.count('⏰') == max_get_value:
                 await bot.edit_message_text(chat_id=user_id, message_id=message_id,
                                             text=f"{schedule_text}\n\n\n <i>⬇️Ещё⬇️</i>",
                                             parse_mode='HTML', reply_markup=button_schedule_all)
             else:
                 await bot.edit_message_text(chat_id=user_id, message_id=message_id,
-                                            text=f"{schedule_text}", parse_mode='HTML')
+                                            text=f"{schedule_text}", parse_mode='HTML', reply_markup=button_back)
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
     await bot.delete_message(chat_id=user_id, message_id=wait_message.message_id)

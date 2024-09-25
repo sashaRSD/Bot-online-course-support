@@ -6,7 +6,7 @@ from aiogram import types
 import gspread.exceptions
 
 
-@dp.callback_query_handler(lambda homeworks: homeworks.data in ['homeworks', 'homeworks_cansel'])
+@dp.callback_query_handler(lambda homeworks: homeworks.data in 'homeworks')
 async def homeworks_menu(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     await callback.answer()
@@ -17,13 +17,10 @@ async def homeworks_menu(callback: types.CallbackQuery):
                                                    callback_data=f'schedule_homeworks')))
         for i, name in enumerate(answer_text, 2):
             button_homeworks.add((InlineKeyboardButton(text=name, callback_data=f'homeworks_name_{i}')))
-        if callback.data == 'homeworks':
-            await bot.send_message(user_id, '<b>🏠 Информация о домашних занятиях </b>',
-                                   parse_mode='HTML', reply_markup=button_homeworks)
-        else:
-            await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
-                                        text='<b>🏠 Информация о домашних занятиях </b>',
-                                        parse_mode='HTML', reply_markup=button_homeworks)
+        button_homeworks.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
+        await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
+                                    text='<b>🏠 Информация о домашних занятиях </b>',
+                                    parse_mode='HTML', reply_markup=button_homeworks)
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
 
@@ -35,7 +32,8 @@ async def homework_name(callback: types.CallbackQuery):
     try:
         answer_text = await get_homeworks(callback.data.split('_')[2])
         button_cansel_homeworks = (InlineKeyboardMarkup()
-                                   .add((InlineKeyboardButton(text='Назад', callback_data=f'homeworks_cansel'))))
+                                   .add((InlineKeyboardButton(text='Назад', callback_data=f'homeworks')))
+                                   .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id, text=answer_text,
                                     parse_mode='HTML', reply_markup=button_cansel_homeworks)
     except gspread.exceptions.APIError:

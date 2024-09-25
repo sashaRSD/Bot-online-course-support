@@ -3,7 +3,7 @@ from dir_google.sheet_myprogress import get_authority, get_num_student
 from dir_bot.create_bot import bot
 
 
-async def menu(username, call_menu_user_id):
+async def menu(username, call_menu_user_id, message_id=0):
     button_menu = InlineKeyboardMarkup() \
         .add(InlineKeyboardButton(text='Получить расписание занятий.', callback_data='schedule')) \
         .add(InlineKeyboardButton(text='Получить информацию о занятиях.', callback_data='lessons')) \
@@ -12,8 +12,11 @@ async def menu(username, call_menu_user_id):
         .add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
     if await authority_student(username, call_menu_user_id) == -1:
         button_menu.add(InlineKeyboardButton(text='Перейти к материалам.', callback_data='qwhdhvadsjhdvfjkhd'))
-
-    await bot.send_message(call_menu_user_id, 'Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
+    if message_id:
+        await bot.edit_message_text(chat_id=call_menu_user_id, message_id=message_id,
+                                    text='Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
+    else:
+        await bot.send_message(call_menu_user_id, 'Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
 
 
 async def authority_student(my_username, my_id):
