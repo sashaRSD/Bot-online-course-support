@@ -7,6 +7,7 @@ from datetime import datetime
 import gspread.exceptions
 
 max_get_value = 4
+message_wait = "⏳ Получаю расписание, подождите пожалуйста ⏳"
 
 
 async def module_cul(authority, local_max_value):
@@ -43,6 +44,7 @@ async def module_cul(authority, local_max_value):
 async def schedule(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     await bot.delete_message(chat_id=user_id, message_id=callback.message.message_id)
+    wait_message = await bot.send_message(user_id, message_wait)
     await callback.answer()
     try:
         authority = await authority_student(callback.message.chat.username, user_id)
@@ -58,6 +60,7 @@ async def schedule(callback: types.CallbackQuery):
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
     await menu(callback.message.chat.username, user_id)
+    await bot.delete_message(chat_id=user_id, message_id=wait_message.message_id)
 
 
 @dp.callback_query_handler(text_contains='schedule_all')
@@ -66,6 +69,7 @@ async def schedule_all(callback: types.CallbackQuery):
     message_id = callback.message.message_id
     await callback.answer()
     await bot.edit_message_reply_markup(user_id, message_id)
+    wait_message = await bot.send_message(user_id, message_wait)
     try:
         authority = await authority_student(callback.message.chat.username, user_id)
         if authority:
@@ -79,8 +83,10 @@ async def schedule_all(callback: types.CallbackQuery):
             else:
                 await bot.edit_message_text(chat_id=user_id, message_id=message_id,
                                             text=f"{schedule_text}", parse_mode='HTML')
+
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
+    await bot.delete_message(chat_id=user_id, message_id=wait_message.message_id)
 
 
 @dp.callback_query_handler(text_contains='schedule_mini')
@@ -89,6 +95,7 @@ async def schedule_mini(callback: types.CallbackQuery):
     message_id = callback.message.message_id
     await callback.answer()
     await bot.edit_message_reply_markup(user_id, message_id)
+    wait_message = await bot.send_message(user_id, message_wait)
     try:
         authority = await authority_student(callback.message.chat.username, user_id)
         if authority:
@@ -104,6 +111,7 @@ async def schedule_mini(callback: types.CallbackQuery):
                                             text=f"{schedule_text}", parse_mode='HTML')
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
+    await bot.delete_message(chat_id=user_id, message_id=wait_message.message_id)
 
 
 async def match_datatime(lessons_date, lessons_time):

@@ -3,27 +3,24 @@ from dir_google.sheet_myprogress import get_authority, get_num_student
 from dir_bot.create_bot import bot
 
 
-button_menu = InlineKeyboardMarkup()\
-    .add(InlineKeyboardButton(text='Получить расписание занятий.', callback_data='schedule'))\
-    .add(InlineKeyboardButton(text='Получить информацию о занятиях.', callback_data='lessons'))\
-    .add(InlineKeyboardButton(text='Получить расписание домашних заданий.', callback_data='schedule_homeworks'))\
-    .add(InlineKeyboardButton(text='Получить информацию о домашних заданиях.', callback_data='homeworks'))\
-    .add(InlineKeyboardButton(text='Получить статус выполнения домашних заданий.', callback_data='myprogress'))\
-    .add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
-
-
 async def menu(username, call_menu_user_id):
-    tmp_button_menu = button_menu
+    button_menu = InlineKeyboardMarkup() \
+        .add(InlineKeyboardButton(text='Получить расписание занятий.', callback_data='schedule')) \
+        .add(InlineKeyboardButton(text='Получить информацию о занятиях.', callback_data='lessons')) \
+        .add(InlineKeyboardButton(text='Получить информацию о домашних заданиях.', callback_data='homeworks')) \
+        .add(InlineKeyboardButton(text='Получить статус выполнения домашних заданий.', callback_data='myprogress')) \
+        .add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
     if await authority_student(username, call_menu_user_id) == -1:
-        tmp_button_menu.add(InlineKeyboardButton(text='Перейти к материалам.', callback_data='qwhdhvadsjhdvfjkhd'))
-    await bot.send_message(call_menu_user_id, 'Пожалуйста, укажите что вас интересует:', reply_markup=tmp_button_menu)
+        button_menu.add(InlineKeyboardButton(text='Перейти к материалам.', callback_data='qwhdhvadsjhdvfjkhd'))
+
+    await bot.send_message(call_menu_user_id, 'Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
 
 
 async def authority_student(my_username, my_id):
     num_student = await get_num_student(my_username, my_id)
     if num_student != -1:
         authority = await get_authority()
-        if len(authority) >= num_student and authority[num_student]:
+        if len(authority)-1 >= num_student and authority[num_student]:
             return authority[num_student].split(" ")
         else:
             return -1
