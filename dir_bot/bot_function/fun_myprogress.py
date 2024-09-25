@@ -1,4 +1,4 @@
-from dir_bot.functions import menu, name_button, google_api_error
+from dir_bot.functions import menu, google_api_error
 from dir_bot.create_bot import bot, dp
 from dir_google import sheet_myprogress
 from aiogram import types
@@ -12,8 +12,7 @@ async def my_progress_menu(callback: types.CallbackQuery):
     await callback.answer()
     try:
         answer_text = await sheet_myprogress.get_progress(callback.message.chat.username, user_id)
-        for i_message in answer_text:
-            await bot.send_message(user_id, i_message, parse_mode='HTML', disable_web_page_preview=True)
+        await bot.send_message(user_id, answer_text, parse_mode='HTML', disable_web_page_preview=True)
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
     await menu(user_id)

@@ -16,3 +16,12 @@ async def get_homeworks(row):
             f'<i>Дата: {row_homework[5]}\n\n'
             f'Описание: {row_homework[2]}\n\n'
             f'Критерии оценивания:\n {row_homework[3]}</i>')
+
+
+async def get_date_homeworks():
+    date_homeworks = worksheet2.col_values(6)
+    date_homeworks.pop(0)
+    homeworks_information = []
+    for i_date in date_homeworks:
+        homeworks_information.append(f'⏰ {i_date}')
+    return homeworks_information

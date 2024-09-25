@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from dir_bot.functions import google_api_error
 from dir_bot.create_bot import bot, dp
-from dir_google import sheet_homeworks
+from dir_google.sheet_homeworks import get_homeworks, get_name_homeworks
 from aiogram import types
 import gspread.exceptions
 
@@ -11,8 +11,10 @@ async def homeworks_menu(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     await callback.answer()
     try:
-        answer_text = await sheet_homeworks.get_name_homeworks()
+        answer_text = await get_name_homeworks()
         button_homeworks = InlineKeyboardMarkup()
+        button_homeworks.add((InlineKeyboardButton(text="⏰ Получить расписание домашних заданий.",
+                                                   callback_data=f'schedule_homeworks')))
         for i, name in enumerate(answer_text, 2):
             button_homeworks.add((InlineKeyboardButton(text=name, callback_data=f'homeworks_name_{i}')))
         if callback.data == 'homeworks':
@@ -31,7 +33,7 @@ async def homework_name(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     await callback.answer()
     try:
-        answer_text = await sheet_homeworks.get_homeworks(callback.data.split('_')[2])
+        answer_text = await get_homeworks(callback.data.split('_')[2])
         button_cansel_homeworks = (InlineKeyboardMarkup()
                                    .add((InlineKeyboardButton(text='Назад', callback_data=f'homeworks_cansel'))))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id, text=answer_text,

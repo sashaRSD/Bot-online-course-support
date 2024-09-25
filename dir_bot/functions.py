@@ -5,6 +5,7 @@ from dir_bot.create_bot import bot
 button_menu = InlineKeyboardMarkup()\
     .add(InlineKeyboardButton(text='Получить расписание занятий.', callback_data='schedule'))\
     .add(InlineKeyboardButton(text='Получить информацию о занятиях.', callback_data='lessons'))\
+    .add(InlineKeyboardButton(text='Получить расписание домашних заданий.', callback_data='schedule_homeworks'))\
     .add(InlineKeyboardButton(text='Получить информацию о домашних заданиях.', callback_data='homeworks'))\
     .add(InlineKeyboardButton(text='Получить статус выполнения домашних заданий.', callback_data='myprogress'))\
     .add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
@@ -15,7 +16,9 @@ async def menu(call_menu_user):
 
 
 async def google_api_error(user_id_error):
-    await bot.send_message(user_id_error, 'Сервер перегружен! \nПовторите попытку, через минуту 😉')
+    await bot.send_message(user_id_error, 'Сервер перегружен! \n'
+                                          'Повторите попытку, через минуту 😉\n\n'
+                                          'Напишите администратору, если ошибка не уходит!')
 
 
 async def name_button(callback_button, callback_data_button):
