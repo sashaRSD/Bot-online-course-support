@@ -4,4 +4,3 @@ from dir_bot.bot_function import fun_lessons
 from dir_bot.bot_function import fun_schedule
 from dir_bot.bot_function import fun_myprogress
 
-

@@ -9,7 +9,7 @@ async def get_progress(my_username, my_id):
             progress_information = ['<b>📈 Статистика ваших дз: </b>\n\n']
             for num_homework in range(1, len(all_table[0])):
                 mark_homework = all_table[i_student][num_homework]
-                if mark_homework:
+                if mark_homework.lstrip("-").isnumeric():
                     mark_homework = int(mark_homework)
                 else:
                     mark_homework = 0

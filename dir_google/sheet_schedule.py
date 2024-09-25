@@ -20,9 +20,9 @@ async def get_schedule(last_element=0):
             schedule.append('</b>')
             return ['\n\n'.join(schedule),  len(schedule)-2]
         else:
-            return 'Занятия закончились 😉'
+            return ["Занятия закончились 😉", 0]
     else:
-        return 'Ошибка базы данных! \nОбратитесь к администратору '
+        return ['Ошибка базы данных! \nОбратитесь к администратору ', 0]
 
 
 async def match_datatime(lessons_date, lessons_time):

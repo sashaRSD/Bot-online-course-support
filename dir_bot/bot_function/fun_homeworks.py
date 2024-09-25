@@ -7,7 +7,7 @@ import gspread.exceptions
 
 
 @dp.callback_query_handler(lambda homeworks: homeworks.data in ['homeworks', 'homeworks_cansel'])
-async def homeworks_name(callback: types.CallbackQuery):
+async def homeworks_menu(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     await callback.answer()
     try:
@@ -27,7 +27,7 @@ async def homeworks_name(callback: types.CallbackQuery):
 
 
 @dp.callback_query_handler(lambda name: 'homeworks_name' in name.data)
-async def homework_menu(callback: types.CallbackQuery):
+async def homework_name(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     await callback.answer()
     try:

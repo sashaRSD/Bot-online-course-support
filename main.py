@@ -1,7 +1,7 @@
 from aiogram.utils.exceptions import MessageCantBeDeleted
 from aiogram.utils import executor
 from aiogram import types
-from dir_bot.functions import menu, button_menu
+from dir_bot.functions import menu
 from dir_bot.create_bot import dp, bot
 from dir_google.google_sheets import worksheet3
 from dir_bot.bot_function import *
@@ -20,7 +20,7 @@ async def commands_start(message: types.Message):
                 await menu(message.from_user.id)
                 return
         await bot.send_message(message.from_user.id, 'Ой, мы вас не нашли в списках студентов...\n'
-                                                     'Идите на... Обратитесь к администратору 😉')
+                                                     'Обратитесь к администратору 😉')
     except:
         await message.delete()
         await message.reply('Напишите мне в личные сообщения')
@@ -31,7 +31,7 @@ async def all_message(message):
     user_id = message.from_user.id
     await message.delete()
     smile = await bot.send_message(user_id, '🗿')
-    text = await bot.send_message(user_id, 'Выбери пункт меню.')
+    text = await bot.send_message(user_id, 'Выбери пункт меню')
     await asyncio.sleep(4)
     await bot.delete_message(chat_id=user_id, message_id=smile.message_id)
     await bot.delete_message(chat_id=user_id, message_id=text.message_id)

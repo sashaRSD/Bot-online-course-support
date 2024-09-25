@@ -13,5 +13,6 @@ async def get_name_homeworks():
 async def get_homeworks(row):
     row_homework = worksheet2.row_values(row)
     return (f'📗 <b>{row_homework[1]}</b>\n\n'
-            f'<i>Описание: {row_homework[2]}\n\n'
+            f'<i>Дата: {row_homework[5]}\n\n'
+            f'Описание: {row_homework[2]}\n\n'
             f'Критерии оценивания:\n {row_homework[3]}</i>')

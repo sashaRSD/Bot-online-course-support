@@ -107,7 +107,7 @@ async def send_review(message, state: FSMContext):
     await state.finish()
     await bot.delete_message(chat_id=user_id, message_id=del_message_id_review)
     try:
-        await sheet_review.send_lessons_support(username_student, lessons_name, mark_id, review_text)
+        await sheet_review.send_lessons_support(username_student, lessons_name, int(mark_id), review_text)
         await bot.send_message(user_id, f"Вы оценили урок <b>{lessons_name}</b> на оценку <b>{mark_id}</b>.\n"
                                         f"Благодарим вас за оставленный отзыв! ❤️",  parse_mode='HTML')
     except gspread.exceptions.APIError:

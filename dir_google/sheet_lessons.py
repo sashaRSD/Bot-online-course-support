@@ -22,7 +22,13 @@ async def get_lesson(name_lesson):
     name_lessons = await get_lessons_inf('name')
     index_lesson = [i for i, name in enumerate(name_lessons, 2) if name_lesson in name][0]
     row_lesson = worksheet1.row_values(index_lesson)
+    if len(row_lesson) >= 8 and row_lesson[7]:
+        teacher = row_lesson[7]
+    else:
+        teacher = 'Игорь Гулькин'
     return (f'<b>📒 {name_lesson}</b>\n\n'
-            f'<i>Цель: {row_lesson[3]}\n\n'
-            f'Описание: {row_lesson[4]}\n\n'
+            f'<i>Дата: {row_lesson[0]}, {row_lesson[1]}\n'
+            f'Преподаватель: {teacher}\n'
+            f'Цель: {row_lesson[3]}\n\n'
+            f'Описание:\n\n {row_lesson[4]}\n\n'
             f'Материалы: {row_lesson[5]}</i>\n')

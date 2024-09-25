@@ -22,6 +22,7 @@ async def schedule(callback: types.CallbackQuery):
                                    parse_mode='HTML', reply_markup=button_schedule_all)
         else:
             await bot.send_message(user_id, f"{answer_text[0]}", parse_mode='HTML')
+            print(answer_text[0])
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
     await menu(user_id)
