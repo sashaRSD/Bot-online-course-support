@@ -5,6 +5,7 @@ from aiogram import types
 from dir_bot.functions import menu, name_button, google_api_error
 from dir_bot.create_bot import dp, bot
 from dir_google import sheet_review
+from datetime import datetime, timedelta
 import gspread.exceptions
 
 
@@ -22,22 +23,62 @@ async def menu_callback(callback: types.CallbackQuery, state: FSMContext):
     await menu(callback.message.chat.username, callback.from_user.id, callback.message.message_id)
 
 
-@dp.callback_query_handler(text_contains='feedback')
+async def match_data(lessons_date):
+    len_elements = range(0, len(lessons_date) + 1)
+    for i_lessons_date in zip(len_elements, lessons_date):
+        if (datetime.strptime(i_lessons_date[1], '%d.%m.%Y') + timedelta(days=1)) > datetime.now():
+            return i_lessons_date[0]
+    return -1
+
+
+@dp.callback_query_handler(lambda back: back.data in 'feedback')
 async def support(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     # await callback.answer()
     try:
-        lessons = await sheet_review.get_lessons_support()
-    except gspread.exceptions.APIError:
+        lessons_mass = await sheet_review.get_lessons_support()
+        if lessons_mass:
+            i_last_lesson = await match_data(lessons_mass[1])
+            if i_last_lesson != 0 and i_last_lesson != -1:
+                i_last_lesson -= 1
+            button_lessons = InlineKeyboardMarkup()
+            button_lessons.add(InlineKeyboardButton(text=f'{lessons_mass[0][i_last_lesson]} '
+                                                         f'({lessons_mass[1][i_last_lesson]})',
+                                                    callback_data=f"LessonNum_{i_last_lesson}"))
+            button_lessons.add((InlineKeyboardButton(text='Все уроки', callback_data='feedback_all')))
+            button_lessons.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
+            await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
+                                        text="Оценить урок?", reply_markup=button_lessons)
+        else:
+            raise IndexError
+    except (gspread.exceptions.APIError, IndexError):
+        await bot.delete_message(user_id, callback.message.message_id)
         await google_api_error(user_id)
         await menu(callback.message.chat.username, user_id)
-        return
-    button_lessons = InlineKeyboardMarkup()
-    for i, i_lesson in enumerate(lessons, 1):
-        button_lessons.add(InlineKeyboardButton(text=i_lesson, callback_data=f"LessonNum_{i}"))
-    button_lessons.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
-    await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
-                                text="Выберите урок, который хотите оценить:", reply_markup=button_lessons)
+
+
+@dp.callback_query_handler(lambda back: back.data in 'feedback_all')
+async def support(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    # await callback.answer()
+    try:
+        lessons_mass = await sheet_review.get_lessons_support()
+        if lessons_mass:
+            lessons_support = []
+            for i in zip(lessons_mass[0], lessons_mass[1]):
+                lessons_support.append(f'{i[0]} ({i[1]})')
+            button_lessons = InlineKeyboardMarkup()
+            for i, i_lesson in enumerate(lessons_support, 1):
+                button_lessons.add(InlineKeyboardButton(text=i_lesson, callback_data=f"LessonNum_{i}"))
+            button_lessons.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
+            await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
+                                        text="Выберите урок, который хотите оценить:", reply_markup=button_lessons)
+        else:
+            raise IndexError
+    except (gspread.exceptions.APIError, IndexError):
+        await bot.delete_message(user_id, callback.message.message_id)
+        await google_api_error(user_id)
+        await menu(callback.message.chat.username, user_id)
 
 
 @dp.callback_query_handler(state="*", text_contains='LessonNum')

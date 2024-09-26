@@ -28,7 +28,7 @@ async def all_message(message):
 
 
 @dp.callback_query_handler(lambda back: back.data in 'back_to_menu')
-async def menu_callback(callback: types.CallbackQuery):
+async def menu_callback_all(callback: types.CallbackQuery):
     await menu(callback.message.chat.username, callback.from_user.id, callback.message.message_id)
 
 
