@@ -46,11 +46,12 @@ async def module_cul(authority, local_max_value):
 async def schedule(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     wait_message = await bot.send_message(user_id, message_wait)
-    await callback.answer()
+    # await callback.answer()
     try:
         authority = await authority_student(callback.message.chat.username, user_id)
         if authority:
             schedule_text = await module_cul(authority, max_get_value)
+
             button_schedule_all = (InlineKeyboardMarkup()
                                    .add((InlineKeyboardButton(text='Показать всё', callback_data='schedule_all')))
                                    .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
@@ -70,7 +71,7 @@ async def schedule(callback: types.CallbackQuery):
 async def schedule_all(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     message_id = callback.message.message_id
-    await callback.answer()
+    # await callback.answer()
     await bot.edit_message_reply_markup(user_id, message_id)
     wait_message = await bot.send_message(user_id, message_wait)
     try:
@@ -97,7 +98,7 @@ async def schedule_all(callback: types.CallbackQuery):
 async def schedule_mini(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     message_id = callback.message.message_id
-    await callback.answer()
+    # await callback.answer()
     await bot.edit_message_reply_markup(user_id, message_id)
     wait_message = await bot.send_message(user_id, message_wait)
     try:

@@ -9,12 +9,12 @@ import gspread.exceptions
 @dp.callback_query_handler(lambda lessons: lessons.data in 'lessons')
 async def menu_module(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    await callback.answer()
+    # await callback.answer()
     try:
-        module_name = await get_module_name()
-        button_module = InlineKeyboardMarkup()
         authority = await authority_student(callback.message.chat.username, user_id)
         if authority:
+            module_name = await get_module_name()
+            button_module = InlineKeyboardMarkup()
             for i, name in enumerate(module_name, 1):
                 if authority == -1 or str(i) in authority:
                     button_module.add((InlineKeyboardButton(text=name, callback_data=f'lessons_module_{i - 1}')))
@@ -30,7 +30,7 @@ async def menu_module(callback: types.CallbackQuery):
 async def menu_lessons(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     index_module_name = int(callback.data.split("_")[2])
-    await callback.answer()
+    # await callback.answer()
     try:
         module_inf = await get_module_inf(index_module_name)
         button_lessons = InlineKeyboardMarkup()
@@ -49,7 +49,7 @@ async def get_lesson(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     index_module_name = callback.data.split("_")[2]
     lesson_name = await name_button(callback.message.reply_markup.inline_keyboard, callback.data)
-    await callback.answer()
+    # await callback.answer()
     try:
         row_lesson = await get_lesson_data(lesson_name)
         if len(row_lesson) >= 8 and row_lesson[7]:

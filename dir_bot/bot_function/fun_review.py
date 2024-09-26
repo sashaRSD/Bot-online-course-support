@@ -16,7 +16,7 @@ class FSMClient(StatesGroup):
 
 @dp.callback_query_handler(lambda back: back.data in 'menu', state="*")
 async def menu_callback(callback: types.CallbackQuery, state: FSMContext):
-    await callback.answer()
+    # await callback.answer()
     if await state.get_state():
         await state.finish()
     await menu(callback.message.chat.username, callback.from_user.id, callback.message.message_id)
@@ -25,7 +25,7 @@ async def menu_callback(callback: types.CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(text_contains='feedback')
 async def support(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    await callback.answer()
+    # await callback.answer()
     try:
         lessons = await sheet_review.get_lessons_support()
     except gspread.exceptions.APIError:
@@ -43,7 +43,7 @@ async def support(callback: types.CallbackQuery):
 @dp.callback_query_handler(state="*", text_contains='LessonNum')
 async def mark(callback: types.CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
-    await callback.answer()
+    # await callback.answer()
     if await state.get_state():
         async with state.proxy() as data:
             lesson_name = data['lessons_support']
@@ -71,7 +71,7 @@ async def review(callback: types.CallbackQuery, state: FSMContext):
     lesson_name = lesson_name[6:lesson_name.find(" \nПоставьте оценку от 1 до 5:")]
     user_id = callback.from_user.id
     mark_id = callback.data.split('_')[1]
-    await callback.answer()
+    # await callback.answer()
 
     button_review = InlineKeyboardMarkup()
     button_review.add((InlineKeyboardButton(text='Отправить без отзыва', callback_data='SendReview')))
@@ -94,7 +94,7 @@ async def review(callback: types.CallbackQuery, state: FSMContext):
 async def send_review(message, state: FSMContext):
     user_id = message.from_user.id
     if await is_callback('SendReview', message):
-        await message.answer()
+        # await message.answer()
         review_text = '-'
         username_student = f'@{message.message.chat.username} (id{user_id})'
     else:

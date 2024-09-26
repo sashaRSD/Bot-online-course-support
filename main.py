@@ -1,9 +1,8 @@
 from aiogram.utils.exceptions import MessageCantBeDeleted
 from aiogram.utils import executor
 from aiogram import types
-from dir_bot.functions import menu, google_api_error
+from dir_bot.functions import menu, google_api_error, get_num_student
 from dir_bot.create_bot import dp, bot
-from dir_google.google_sheets import worksheet3
 from dir_bot.bot_function import *
 import asyncio
 
@@ -11,16 +10,8 @@ import asyncio
 @dp.message_handler(commands=['start'])
 async def commands_start(message: types.Message):
     try:
-        username_students = worksheet3.col_values(1)
-        for student in username_students:
-            if (f'@{message.from_user.username}' in student or
-                    f'id{message.from_user.id}' in student or
-                    message.from_user.id == 460325052):
-                await bot.send_message(message.chat.id, f'Добрый день, {message.from_user.first_name}! 👋')
-                await menu(message.from_user.username, message.from_user.id)
-                return
-        await bot.send_message(message.from_user.id, 'Ой, мы вас не нашли в списках студентов...\n'
-                                                     'Обратитесь к администратору 😉')
+        await bot.send_message(message.chat.id, f'Добрый день, {message.from_user.first_name}! 👋')
+        await menu(message.from_user.username, message.from_user.id)
     except:
         await google_api_error(message.from_user.id)
 
@@ -37,7 +28,7 @@ async def all_message(message):
 
 
 @dp.callback_query_handler(lambda back: back.data in 'back_to_menu')
-async def all_message(callback: types.CallbackQuery):
+async def menu_callback(callback: types.CallbackQuery):
     await menu(callback.message.chat.username, callback.from_user.id, callback.message.message_id)
 
 
