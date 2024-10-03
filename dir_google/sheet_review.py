@@ -5,9 +5,7 @@ async def get_lessons_support():
     lessons_name = list(filter(None, await get_data_sheet('name')))
     lessons_date = [date for date in await get_data_sheet('date') if 'Модуль' not in date]
     lessons_time = list(filter(None, await get_data_sheet('time')))
-    # if len(lessons_name) == len(lessons_date):
     return [lessons_name, lessons_date, lessons_time]
-    # return 0
 
 
 async def send_lessons_support(student, lesson, mark, message):

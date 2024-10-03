@@ -1,5 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from dir_google.sheet_myprogress import get_col_authority, get_col_student
+from dir_google.sheet_bot_data import get_materials_link
+from dir_google.sheet_last_or_next_lesson import get_lessons_inf
 from dir_bot.create_bot import bot
 from datetime import datetime
 
@@ -8,14 +10,18 @@ async def menu(username, call_menu_user_id, message_id=0):
     authority_tmp = await authority_student(username, call_menu_user_id)
     if authority_tmp:
         button_menu = InlineKeyboardMarkup() \
+            .add(InlineKeyboardButton(text='Следующий урок.', callback_data=await last_or_next(next_lesson=1))) \
+            .add(InlineKeyboardButton(text='Предыдущий урок.', callback_data=await last_or_next(next_lesson=0))) \
             .add(InlineKeyboardButton(text='Получить расписание занятий.', callback_data='schedule')) \
             .add(InlineKeyboardButton(text='Получить информацию о занятиях.', callback_data='lessons')) \
             .add(InlineKeyboardButton(text='Получить информацию о домашних заданиях.', callback_data='homeworks')) \
             .add(InlineKeyboardButton(text='Получить статус выполнения домашних заданий.', callback_data='myprogress')) \
             .add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
         if authority_tmp == -1:
-            button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
-                                                 url='https://disk.yandex.ru/d/355CI_7ELLCBsQ'))
+            materials_link = await get_materials_link()
+            if materials_link:
+                button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
+                                                     url=materials_link))
         if message_id:
             await bot.edit_message_text(chat_id=call_menu_user_id, message_id=message_id,
                                         text='Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
@@ -52,6 +58,16 @@ async def google_api_error(user_id_error):
     await bot.send_message(user_id_error, 'Сервер перегружен! \n'
                                           'Повторите попытку, через минуту 😉\n\n'
                                           'Напишите администратору, если ошибка не уходит!')
+
+
+async def last_or_next(next_lesson):
+    lessons_mass = await get_lessons_inf()
+    i_last_lesson = await match_datatime(lessons_mass[1], lessons_mass[2])
+    if i_last_lesson != 0 and i_last_lesson != -1:
+        i_last_lesson -= 1
+    for i_name_lesson, name_lesson in enumerate(lessons_mass[3], 2):
+        if name_lesson == lessons_mass[0][i_last_lesson]:
+            return f'lessons_num_{i_name_lesson+next_lesson}'
 
 
 async def match_datatime(lessons_date, lessons_time):
