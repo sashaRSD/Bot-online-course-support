@@ -3,6 +3,7 @@ from aiogram.utils import executor
 from aiogram import types
 from dir_bot.functions import menu, google_api_error
 from dir_bot.create_bot import dp, bot
+from dir_google.sheet_myprogress import get_table_progress
 from dir_bot.bot_function import *
 import asyncio
 
@@ -15,6 +16,36 @@ async def commands_start(message: types.Message):
     except:
         await google_api_error(message.from_user.id)
 
+
+@dp.message_handler(commands=['lesson_push'])
+async def commands_start(message: types.Message):
+    user_id = message.from_user.id
+    authority = str(message.text.split(" ")[1])
+    url = message.text.split(" ")[2]
+    table_student = await get_table_progress()
+    list_user_id = []
+    lost_user_id = []
+    send_score = 0
+    for i_mass_student in table_student:
+        if (not i_mass_student[1]) or (authority in i_mass_student[1]):
+            student = i_mass_student[0].split(" ")
+            for id_in_name in student:
+                if 'id' in id_in_name:
+                    list_user_id.append(id_in_name[2:])
+    for i_user_id in list_user_id:
+        try:
+            await bot.send_message(i_user_id, f'Урок начнется через 5 минут!\n'
+                                              f'{url}')
+            send_score += 1
+        except:
+            lost_user_id.append(i_user_id)
+    if lost_user_id:
+        await bot.send_message(user_id, f'Найдено учеников: {len(list_user_id)}\n'
+                                        f'Сообщение отправлено {send_score} раз!\n\n'
+                                        f'Не отправлено: {lost_user_id}')
+    else:
+        await bot.send_message(user_id, f'Найдено учеников: {len(list_user_id)}\n'
+                                        f'Сообщение отправлено всем!')
 
 @dp.message_handler()
 async def all_message(message):
