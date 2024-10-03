@@ -1,9 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from dir_bot.functions import google_api_error, authority_student
+from dir_bot.functions import google_api_error, authority_student, match_datatime
 from dir_bot.create_bot import bot, dp
 from dir_google.google_sheets import get_module_name, get_module_inf
 from aiogram import types
-from datetime import datetime
 import gspread.exceptions
 
 max_get_value = 4
@@ -118,11 +117,3 @@ async def schedule_mini(callback: types.CallbackQuery):
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
     await bot.delete_message(chat_id=user_id, message_id=wait_message.message_id)
-
-
-async def match_datatime(lessons_date, lessons_time):
-    len_elements = range(0, len(lessons_date)+1)
-    for i in zip(len_elements, lessons_date, lessons_time):
-        if datetime.strptime(f"{i[1]} {i[2]}", '%d.%m.%Y %H:%M МСК') > datetime.now():
-            return i[0]
-    return -1

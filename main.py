@@ -1,7 +1,7 @@
 from aiogram.utils.exceptions import MessageCantBeDeleted
 from aiogram.utils import executor
 from aiogram import types
-from dir_bot.functions import menu, google_api_error, get_num_student
+from dir_bot.functions import menu, google_api_error
 from dir_bot.create_bot import dp, bot
 from dir_bot.bot_function import *
 import asyncio
@@ -34,6 +34,7 @@ async def menu_callback_all(callback: types.CallbackQuery):
 
 @dp.errors_handler(exception=MessageCantBeDeleted)
 async def error_delete_2day(update, exception: MessageCantBeDeleted):
+    print(update)
     chat_id = update['callback_query']['from']['id']
     message_id = update['callback_query']['message']['message_id']
     await bot.edit_message_text(text='<< Меню обновлено >>', chat_id=chat_id, message_id=message_id)

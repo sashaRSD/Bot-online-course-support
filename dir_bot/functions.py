@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from dir_google.sheet_myprogress import get_col_authority, get_col_student
 from dir_bot.create_bot import bot
+from datetime import datetime
 
 
 async def menu(username, call_menu_user_id, message_id=0):
@@ -13,7 +14,8 @@ async def menu(username, call_menu_user_id, message_id=0):
             .add(InlineKeyboardButton(text='Получить статус выполнения домашних заданий.', callback_data='myprogress')) \
             .add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
         if authority_tmp == -1:
-            button_menu.add(InlineKeyboardButton(text='Перейти к материалам.', callback_data='qwhdhvadsjhdvfjkhd'))
+            button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
+                                                 url='https://disk.yandex.ru/d/355CI_7ELLCBsQ'))
         if message_id:
             await bot.edit_message_text(chat_id=call_menu_user_id, message_id=message_id,
                                         text='Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
@@ -50,6 +52,14 @@ async def google_api_error(user_id_error):
     await bot.send_message(user_id_error, 'Сервер перегружен! \n'
                                           'Повторите попытку, через минуту 😉\n\n'
                                           'Напишите администратору, если ошибка не уходит!')
+
+
+async def match_datatime(lessons_date, lessons_time):
+    len_elements = range(0, len(lessons_date)+1)
+    for i in zip(len_elements, lessons_date, lessons_time):
+        if datetime.strptime(f"{i[1]} {i[2]}", '%d.%m.%Y %H:%M МСК') > datetime.now():
+            return i[0]
+    return -1
 
 
 async def name_button(callback_button, callback_data_button):
