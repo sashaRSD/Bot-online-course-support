@@ -1,6 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from dir_google.sheet_myprogress import get_col_authority, get_col_student
-from dir_google.sheet_bot_data import get_materials_link
 from dir_google.sheet_last_or_next_lesson import get_lessons_inf
 from dir_bot.create_bot import bot
 from datetime import datetime
@@ -20,10 +19,6 @@ async def menu(username, call_menu_user_id, message_id=0):
         if authority_tmp == -1:
             button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
                                                  url='https://disk.yandex.ru/d/355CI_7ELLCBsQ'))
-            # materials_link = await get_materials_link()
-            # if materials_link:
-            #     button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
-            #                                          url=materials_link))
         if message_id:
             await bot.edit_message_text(chat_id=call_menu_user_id, message_id=message_id,
                                         text='Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
