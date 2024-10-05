@@ -22,7 +22,7 @@ async def homeworks_menu(callback: types.CallbackQuery):
             for i_module_num, i_name_homeworks in zip(module_num, name_homeworks):
                 index += 1
                 if authority == -1 or i_module_num in authority:
-                    button_homeworks.add((InlineKeyboardButton(text=f'📗 {i_name_homeworks}',
+                    button_homeworks.add((InlineKeyboardButton(text=f'📗 {index-1}. {i_name_homeworks}',
                                                                callback_data=f'homeworks_name_{index}')))
             button_homeworks.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
             await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,

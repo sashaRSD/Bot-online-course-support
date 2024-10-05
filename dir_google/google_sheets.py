@@ -23,9 +23,16 @@ async def get_data_sheet(title):
     return information
 
 
-async def get_module_name():
+async def get_modules(is_name):
     all_module_names = await get_data_sheet('date')
-    return [module for module in all_module_names if 'Модуль' in module]
+    modules_inf = []
+    for index, module_name in enumerate(all_module_names, 0):
+        if 'Модуль' in module_name:
+            if is_name:
+                modules_inf.append(module_name)
+            else:
+                modules_inf.append(index)
+    return modules_inf
 
 
 async def get_module_inf(index_module):
@@ -35,6 +42,7 @@ async def get_module_inf(index_module):
     index_lessons_module = [i for i, module in enumerate(date_and_module, 0) if 'Модуль' in module]
     index_lessons_module.append(len(date_and_module))
 
+    module_name = date_and_module[index_lessons_module[index_module]]
     lessons_name = []
     lessons_date = []
     lessons_time = []
@@ -42,5 +50,5 @@ async def get_module_inf(index_module):
         lessons_name.append(name_lessons[i_lesson][name_lessons[i_lesson].find(".")+1:])
         lessons_date.append(date_and_module[i_lesson])
         lessons_time.append(time_lessons[i_lesson])
-    return [date_and_module[index_lessons_module[index_module]], lessons_name, lessons_date, lessons_time]
+    return [module_name, lessons_name, lessons_date, lessons_time]
 

@@ -1,7 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from dir_bot.functions import google_api_error, name_button, authority_student
+from dir_bot.functions import google_api_error, authority_student
 from dir_bot.create_bot import bot, dp
-from dir_google.sheet_lessons import get_lesson_data, get_module_inf, get_module_name
+from dir_google.sheet_lessons import get_lesson_data
+from dir_google.google_sheets import get_module_inf, get_modules
 from aiogram import types
 import gspread.exceptions
 
@@ -13,7 +14,7 @@ async def menu_module(callback: types.CallbackQuery):
     try:
         authority = await authority_student(callback.message.chat.username, user_id)
         if authority:
-            module_name = await get_module_name()
+            module_name = await get_modules(is_name=1)
             button_module = InlineKeyboardMarkup()
             for i, name in enumerate(module_name, 1):
                 if authority == -1 or str(i) in authority:
@@ -34,8 +35,9 @@ async def menu_lessons(callback: types.CallbackQuery):
     try:
         module_inf = await get_module_inf(index_module_name)
         button_lessons = InlineKeyboardMarkup()
-        for i, name in enumerate(module_inf[1]):
-            button_lessons.add((InlineKeyboardButton(text=name, callback_data=f'lessons_name_{index_module_name}_{i}')))
+        for i, name in enumerate(module_inf[1], 1):
+            button_lessons.add((InlineKeyboardButton(text=f'{i}. {name}',
+                                                     callback_data=f'lessons_name_{index_module_name}_{i}')))
         button_lessons.add((InlineKeyboardButton(text='Назад', callback_data=f'lessons')))
         button_lessons.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
@@ -47,25 +49,26 @@ async def menu_lessons(callback: types.CallbackQuery):
 @dp.callback_query_handler(lambda name: 'lessons_name' in name.data)
 async def get_lesson(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    index_module_name = callback.data.split("_")[2]
-    lesson_name = await name_button(callback.message.reply_markup.inline_keyboard, callback.data)
+    index_module = int(callback.data.split("_")[2])
+    index_lesson = int(callback.data.split("_")[3])
+    index_module_global = (await get_modules(is_name=0))[index_module]
     # await callback.answer()
     try:
-        row_lesson = await get_lesson_data(lesson_name)
+        row_lesson = await get_lesson_data(index_module_global+index_lesson+2)
         if len(row_lesson) >= 8 and row_lesson[7]:
             teacher = row_lesson[7]
         else:
             teacher = 'Игорь Гулькин'
-        data_lesson = (f'<b>📒 {lesson_name}</b>\n\n'
+        data_lesson = (f'<b>📒 {row_lesson[2]}</b>\n\n'
                        f'<i>Дата: {row_lesson[0]}, {row_lesson[1]}\n'
                        f'Преподаватель: {teacher}\n'
                        f'Цель: {row_lesson[3]}\n\n'
                        f'Описание:\n\n {row_lesson[4]}\n\n'
                        f'Материалы: {row_lesson[5]}</i>\n')
         menu_cansel = (InlineKeyboardMarkup()
-                       .add((InlineKeyboardButton(text='Другой урок',
-                                                  callback_data=f'lessons_module_{index_module_name}')))
-                       .add((InlineKeyboardButton(text='Другой модуль', callback_data=f'lessons')))
+                       .add((InlineKeyboardButton(text='Назад',
+                                                  callback_data=f'lessons_module_{index_module}')))
+                       .add((InlineKeyboardButton(text='В модули', callback_data=f'lessons')))
                        .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                     text=f"{data_lesson}",

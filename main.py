@@ -47,6 +47,7 @@ async def commands_start(message: types.Message):
         await bot.send_message(user_id, f'Найдено учеников: {len(list_user_id)}\n'
                                         f'Сообщение отправлено всем!')
 
+
 @dp.message_handler()
 async def all_message(message):
     user_id = message.from_user.id

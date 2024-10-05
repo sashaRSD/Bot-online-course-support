@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram import types
-from dir_bot.functions import menu, name_button, google_api_error, match_datatime
+from dir_bot.functions import menu, google_api_error, match_datatime
 from dir_bot.create_bot import dp, bot
 from dir_google import sheet_review
 import gspread.exceptions
@@ -146,4 +146,11 @@ async def is_callback(name_callback, data):
         if name_callback in item:
             return True
     return False
+
+
+async def name_button(callback_button, callback_data_button):
+    for callback_button1 in callback_button:
+        for callback_button2 in callback_button1:
+            if callback_data_button in callback_button2.callback_data:
+                return callback_button2.text
 

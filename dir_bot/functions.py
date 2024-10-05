@@ -18,10 +18,12 @@ async def menu(username, call_menu_user_id, message_id=0):
             .add(InlineKeyboardButton(text='Получить статус выполнения домашних заданий.', callback_data='myprogress')) \
             .add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
         if authority_tmp == -1:
-            materials_link = await get_materials_link()
-            if materials_link:
-                button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
-                                                     url=materials_link))
+            button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
+                                                 url='https://disk.yandex.ru/d/355CI_7ELLCBsQ'))
+            # materials_link = await get_materials_link()
+            # if materials_link:
+            #     button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
+            #                                          url=materials_link))
         if message_id:
             await bot.edit_message_text(chat_id=call_menu_user_id, message_id=message_id,
                                         text='Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
@@ -76,10 +78,3 @@ async def match_datatime(lessons_date, lessons_time):
         if datetime.strptime(f"{i[1]} {i[2]}", '%d.%m.%Y %H:%M МСК') > datetime.now():
             return i[0]
     return -1
-
-
-async def name_button(callback_button, callback_data_button):
-    for callback_button1 in callback_button:
-        for callback_button2 in callback_button1:
-            if callback_data_button in callback_button2.callback_data:
-                return callback_button2.text
