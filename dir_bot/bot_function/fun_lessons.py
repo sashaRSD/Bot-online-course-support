@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from dir_bot.functions import google_api_error, authority_student
 from dir_bot.create_bot import bot, dp
 from dir_google.sheet_lessons import get_lesson_data
-from dir_google.google_sheets import get_module_inf, get_modules
+from dir_google.google_sheets import get_module_inf, get_modules_name, get_modules_index
 from aiogram import types
 import gspread.exceptions
 
@@ -14,7 +14,7 @@ async def menu_module(callback: types.CallbackQuery):
     try:
         authority = await authority_student(callback.message.chat.username, user_id)
         if authority:
-            module_name = await get_modules(is_name=1)
+            module_name = await get_modules_name()
             button_module = InlineKeyboardMarkup()
             for i, name in enumerate(module_name, 1):
                 if authority == -1 or str(i) in authority:
@@ -50,15 +50,18 @@ async def menu_lessons(callback: types.CallbackQuery):
 async def get_lesson(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     menu_cansel = InlineKeyboardMarkup()
+    index_modules_global = await get_modules_index()
     if "lesson_num" in callback.data:
         index_module = int(callback.data.split("_")[2])
         index_lesson = int(callback.data.split("_")[3])
-        index_module_global = await get_modules(is_name=0)
-        index_lesson_global = index_module_global[index_module]+index_lesson+2
+        index_lesson_global = index_modules_global[index_module]+index_lesson+2
         menu_cansel.add((InlineKeyboardButton(text='Назад', callback_data=f'lesson_module_{index_module}')))
         menu_cansel.add((InlineKeyboardButton(text='В модули', callback_data=f'lessons')))
     else:
         index_lesson_global = int(callback.data.split("_")[2])
+        i_module_max = [i for i, i_modules in enumerate(index_modules_global) if i_modules > index_lesson_global][0]
+        i_module_min = i_module_max - 1
+
     # await callback.answer()
     try:
         row_lesson = await get_lesson_data(index_lesson_global)
@@ -78,4 +81,3 @@ async def get_lesson(callback: types.CallbackQuery):
                                     parse_mode='HTML', disable_web_page_preview=True, reply_markup=menu_cansel)
     except gspread.exceptions.APIError:
         await google_api_error(user_id)
-

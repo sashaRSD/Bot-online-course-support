@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from dir_bot.functions import google_api_error, authority_student, match_datatime
 from dir_bot.create_bot import bot, dp
-from dir_google.google_sheets import get_modules, get_module_inf
+from dir_google.google_sheets import get_modules_name, get_module_inf
 from aiogram import types
 import gspread.exceptions
 
@@ -12,15 +12,15 @@ button_back = (InlineKeyboardMarkup()
 
 
 async def module_cul(authority, local_max_value):
-    module_name = await get_modules(is_name=1)
+    module_name = await get_modules_name()
     data_schedule = []
     lessons_date = []
     lessons_time = []
     lessons_name = []
     schedule_text = " <b>Расписание занятий:"
-    for i, name in enumerate(module_name, 1):
-        if authority == -1 or str(i) in authority:
-            data_schedule.append(await get_module_inf(i - 1))
+    for i in range(len(module_name)):
+        if authority == -1 or str(i+1) in authority:
+            data_schedule.append(await get_module_inf(i))
     for i_module in data_schedule:
         lessons_name += i_module[1]
         lessons_date += i_module[2]

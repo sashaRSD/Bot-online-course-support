@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from dir_google.sheet_myprogress import get_col_authority, get_col_student
-from dir_google.sheet_lessons import get_all_lessons_inf
+from dir_google.sheet_lessons import get_lessons_datatime
+from dir_google.google_sheets import get_modules_index
 from dir_bot.create_bot import bot
 from datetime import datetime
 
@@ -8,18 +9,21 @@ from datetime import datetime
 async def menu(username, call_menu_user_id, message_id=0):
     authority_tmp = await authority_student(username, call_menu_user_id)
     if authority_tmp:
-        last_lesson = await last_lesson_index()
-        button_menu = InlineKeyboardMarkup() \
-            .add(InlineKeyboardButton(text='Следующий урок.', callback_data=f'lesson_index_{last_lesson+1}')) \
-            .add(InlineKeyboardButton(text='Предыдущий урок.', callback_data=f'lesson_index_{last_lesson}')) \
-            .add(InlineKeyboardButton(text='Получить расписание занятий.', callback_data='schedule')) \
-            .add(InlineKeyboardButton(text='Получить информацию о занятиях.', callback_data='lessons')) \
-            .add(InlineKeyboardButton(text='Получить информацию о домашних заданиях.', callback_data='homeworks')) \
-            .add(InlineKeyboardButton(text='Получить статус выполнения домашних заданий.', callback_data='myprogress')) \
-            .add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
+        button_menu = InlineKeyboardMarkup()
+        i_lesson = await button_lesson_index(authority_tmp)
+        if i_lesson[1] != -1:
+            button_menu.add(InlineKeyboardButton(text='Следующий урок.', callback_data=f'lesson_index_{i_lesson[1]}'))
+        if i_lesson[0] != -1:
+            button_menu.add(InlineKeyboardButton(text='Предыдущий урок.', callback_data=f'lesson_index_{i_lesson[0]}'))
+        button_menu.add(InlineKeyboardButton(text='Получить расписание занятий.', callback_data='schedule'))
+        button_menu.add(InlineKeyboardButton(text='Получить информацию о занятиях.', callback_data='lessons'))
+        button_menu.add(InlineKeyboardButton(text='Получить информацию о домашних заданиях.', callback_data='homeworks'))
+        button_menu.add(InlineKeyboardButton(text='Получить статус выполнения домашних заданий.', callback_data='myprogress'))
+        button_menu.add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
         if authority_tmp == -1:
             button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
                                                  url='https://disk.yandex.ru/d/355CI_7ELLCBsQ'))
+
         if message_id:
             await bot.edit_message_text(chat_id=call_menu_user_id, message_id=message_id,
                                         text='Пожалуйста, укажите что вас интересует:', reply_markup=button_menu)
@@ -58,14 +62,26 @@ async def google_api_error(user_id_error):
                                           'Напишите администратору, если ошибка не уходит!')
 
 
-async def last_lesson_index():
-    lessons_mass = await get_all_lessons_inf()
-    i_last_lesson = await match_datatime(lessons_mass[1], lessons_mass[2])
-    if i_last_lesson != 0 and i_last_lesson != -1:
-        i_last_lesson -= 1
-    for i_name_lesson, name_lesson in enumerate(lessons_mass[3], 2):
-        if name_lesson == lessons_mass[0][i_last_lesson]:
-            return i_name_lesson
+async def button_lesson_index(authority):
+    i_mass_authority_lesson = []
+    all_modules_index = await get_modules_index()
+    for i_module in range(len(all_modules_index)-1):
+        if authority == -1 or str(i_module+1) in authority:
+            for i_lesson in range(all_modules_index[i_module]+1, all_modules_index[i_module+1]):
+                i_lesson_global = i_lesson + 2
+                i_mass_authority_lesson.append(i_lesson_global)
+    lessons_datatime = await get_lessons_datatime(i_mass_authority_lesson)
+    index_lesson_authority = await match_datatime(lessons_datatime[0], lessons_datatime[1])
+    if index_lesson_authority == -1:
+        i_last_lesson_global = i_mass_authority_lesson[-1]
+        i_next_lesson_global = -1
+    elif index_lesson_authority == 0:
+        i_last_lesson_global = -1
+        i_next_lesson_global = i_mass_authority_lesson[0]
+    else:
+        i_last_lesson_global = i_mass_authority_lesson[index_lesson_authority-1]
+        i_next_lesson_global = i_mass_authority_lesson[index_lesson_authority]
+    return [i_last_lesson_global, i_next_lesson_global]
 
 
 async def match_datatime(lessons_date, lessons_time):
