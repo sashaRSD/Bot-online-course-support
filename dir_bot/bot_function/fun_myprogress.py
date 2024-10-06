@@ -30,7 +30,7 @@ async def my_progress_menu(callback: types.CallbackQuery):
                     progress_information += (f' {my_progress[0][num_homework][my_progress[0][num_homework].find(":")+1:]}:'
                                              f' {abs(mark_homework)}/10\n')
             button_back = (InlineKeyboardMarkup()
-                           .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
+                           .add((InlineKeyboardButton(text='🏠 В меню', callback_data='back_to_menu'))))
             await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                         text=progress_information,
                                         parse_mode='HTML', reply_markup=button_back)

@@ -25,7 +25,7 @@ async def schedule_homeworks(callback: types.CallbackQuery):
                                     f"📗 {i_name_homeworks}\n"
                                     f"⏰ {i_date_homeworks}")
             button_back = (InlineKeyboardMarkup()
-                           .add((InlineKeyboardButton(text='Назад', callback_data='homeworks'))))
+                           .add((InlineKeyboardButton(text='⬅️ Назад', callback_data='homeworks'))))
             await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                         text=f'<b>Расписание домашних заданий{answer_text}</b>',
                                         parse_mode='HTML', reply_markup=button_back)

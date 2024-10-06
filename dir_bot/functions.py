@@ -11,18 +11,18 @@ async def menu(username, call_menu_user_id, message_id=0):
     if authority_tmp:
         button_menu = InlineKeyboardMarkup()
         i_lesson = await button_lesson_index(authority_tmp)
-        if i_lesson[1] != -1:
-            button_menu.add(InlineKeyboardButton(text='Следующий урок.', callback_data=f'lesson_index_{i_lesson[1]}'))
-        if i_lesson[0] != -1:
-            button_menu.add(InlineKeyboardButton(text='Предыдущий урок.', callback_data=f'lesson_index_{i_lesson[0]}'))
-        button_menu.add(InlineKeyboardButton(text='Получить расписание занятий.', callback_data='schedule'))
-        button_menu.add(InlineKeyboardButton(text='Получить информацию о занятиях.', callback_data='lessons'))
-        button_menu.add(InlineKeyboardButton(text='Получить информацию о домашних заданиях.', callback_data='homeworks'))
-        button_menu.add(InlineKeyboardButton(text='Получить статус выполнения домашних заданий.', callback_data='myprogress'))
-        button_menu.add(InlineKeyboardButton(text='Поставить отзыв о занятии.', callback_data='feedback'))
+        button_menu.add(InlineKeyboardButton(text='📖 Вебинары', callback_data='lessons'))
         if authority_tmp == -1:
-            button_menu.add(InlineKeyboardButton(text='Перейти к материалам.',
+            button_menu.add(InlineKeyboardButton(text='📂 Яндекс Диск',
                                                  url='https://disk.yandex.ru/d/355CI_7ELLCBsQ'))
+        if i_lesson[1] != -1:
+            button_menu.add(InlineKeyboardButton(text='🔼 Следующий урок', callback_data=f'lesson_index_{i_lesson[1]}'))
+        if i_lesson[0] != -1:
+            button_menu.add(InlineKeyboardButton(text='🔽 Предыдущий урок', callback_data=f'lesson_index_{i_lesson[0]}'))
+        button_menu.add(InlineKeyboardButton(text='📗 Домашние задания', callback_data='homeworks'))
+        button_menu.add(InlineKeyboardButton(text='🗓 Расписание занятий', callback_data='schedule'))
+        button_menu.add(InlineKeyboardButton(text='📈 Моя статистика ', callback_data='myprogress'))
+        button_menu.add(InlineKeyboardButton(text='✉️ Оставить отзыв', callback_data='feedback'))
 
         if message_id:
             await bot.edit_message_text(chat_id=call_menu_user_id, message_id=message_id,

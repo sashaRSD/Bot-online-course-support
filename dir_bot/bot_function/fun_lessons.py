@@ -19,7 +19,7 @@ async def menu_module(callback: types.CallbackQuery):
             for i, name in enumerate(module_name, 1):
                 if authority == -1 or str(i) in authority:
                     button_module.add((InlineKeyboardButton(text=name, callback_data=f'lesson_module_{i - 1}')))
-            button_module.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
+            button_module.add((InlineKeyboardButton(text='🏠 В меню', callback_data='back_to_menu')))
             await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                         text='<b>🗂 Информация о занятиях </b>',
                                         parse_mode='HTML', reply_markup=button_module)
@@ -39,8 +39,8 @@ async def menu_lessons(callback: types.CallbackQuery):
         for i, name in enumerate(module_inf[1], 1):
             button_lessons.add((InlineKeyboardButton(text=f'{i}. {name}',
                                                      callback_data=f'lesson_num_{index_module}_{lesson_in_module}_{i}')))
-        button_lessons.add((InlineKeyboardButton(text='Назад', callback_data=f'lessons')))
-        button_lessons.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
+        button_lessons.add((InlineKeyboardButton(text='⬅️ Назад', callback_data=f'lessons')))
+        button_lessons.add((InlineKeyboardButton(text='🏠 В меню', callback_data='back_to_menu')))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                     text=f'📂 <b>{module_inf[0]}</b>', parse_mode='HTML', reply_markup=button_lessons)
     except gspread.exceptions.APIError:
@@ -63,7 +63,7 @@ async def get_lesson(callback: types.CallbackQuery):
         if index_lesson != 1:
             menu_cansel.add((InlineKeyboardButton(text='Предыдущий урок',
                                                   callback_data=f'lesson_num_{index_module}_{lesson_in_module}_{index_lesson-1}')))
-        menu_cansel.add((InlineKeyboardButton(text='Назад', callback_data=f'lesson_module_{index_module}')))
+        menu_cansel.add((InlineKeyboardButton(text='⬅️ Назад', callback_data=f'lesson_module_{index_module}')))
         menu_cansel.add((InlineKeyboardButton(text='В модули', callback_data=f'lessons')))
     else:
         index_lesson_global = int(callback.data.split("_")[2])
@@ -80,7 +80,7 @@ async def get_lesson(callback: types.CallbackQuery):
                        f'Цель: {row_lesson[3]}\n\n'
                        f'Описание:\n\n {row_lesson[4]}\n\n'
                        f'Материалы: {row_lesson[5]}</i>\n')
-        menu_cansel.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
+        menu_cansel.add((InlineKeyboardButton(text='🏠 В меню', callback_data='back_to_menu')))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                     text=f"{data_lesson}",
                                     parse_mode='HTML', disable_web_page_preview=True, reply_markup=menu_cansel)

@@ -53,7 +53,7 @@ async def schedule(callback: types.CallbackQuery):
 
             button_schedule_all = (InlineKeyboardMarkup()
                                    .add((InlineKeyboardButton(text='Показать всё', callback_data='schedule_all')))
-                                   .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
+                                   .add((InlineKeyboardButton(text='🏠 В меню', callback_data='back_to_menu'))))
             if schedule_text.count('⏰') == max_get_value:
                 await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                             text= f"{schedule_text}\n\n\n <i>⬇️Ещё⬇️</i>",
@@ -79,7 +79,7 @@ async def schedule_all(callback: types.CallbackQuery):
             schedule_text = await module_cul(authority, 0)
             button_schedule_mini = (InlineKeyboardMarkup()
                                     .add((InlineKeyboardButton(text='Свернуть', callback_data='schedule_mini')))
-                                    .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
+                                    .add((InlineKeyboardButton(text='🏠 В меню', callback_data='back_to_menu'))))
             if schedule_text.count('⏰') > max_get_value:
                 await bot.edit_message_text(chat_id=user_id, message_id=message_id,
                                             text=f"{schedule_text}\n",
@@ -106,7 +106,7 @@ async def schedule_mini(callback: types.CallbackQuery):
             schedule_text = await module_cul(authority, max_get_value)
             button_schedule_all = (InlineKeyboardMarkup()
                                    .add((InlineKeyboardButton(text='Показать всё', callback_data='schedule_all')))
-                                   .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
+                                   .add((InlineKeyboardButton(text='🏠 В меню', callback_data='back_to_menu'))))
             if schedule_text.count('⏰') == max_get_value:
                 await bot.edit_message_text(chat_id=user_id, message_id=message_id,
                                             text=f"{schedule_text}\n\n\n <i>⬇️Ещё⬇️</i>",

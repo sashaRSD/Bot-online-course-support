@@ -35,8 +35,8 @@ async def support(callback: types.CallbackQuery):
         button_lessons.add(InlineKeyboardButton(text=f'{lessons_mass[0][i_last_lesson]} '
                                                      f'({lessons_mass[1][i_last_lesson]})',
                                                 callback_data=f"LessonNum_{i_last_lesson}"))
-        button_lessons.add((InlineKeyboardButton(text='Все уроки', callback_data='feedback_all')))
-        button_lessons.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
+        button_lessons.add((InlineKeyboardButton(text='📖 Выбрать урок', callback_data='feedback_all')))
+        button_lessons.add((InlineKeyboardButton(text='🏠 В меню', callback_data='menu')))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                     text="Оценить урок?", reply_markup=button_lessons)
     except gspread.exceptions.APIError:
@@ -57,7 +57,7 @@ async def support(callback: types.CallbackQuery):
         button_lessons = InlineKeyboardMarkup()
         for i, i_lesson in enumerate(lessons_support, 1):
             button_lessons.add(InlineKeyboardButton(text=i_lesson, callback_data=f"LessonNum_{i}"))
-        button_lessons.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
+        button_lessons.add((InlineKeyboardButton(text='🏠 В меню', callback_data='menu')))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                     text="Выберите урок, который хотите оценить:", reply_markup=button_lessons)
     except gspread.exceptions.APIError:
@@ -86,7 +86,7 @@ async def mark(callback: types.CallbackQuery, state: FSMContext):
     mark5 = types.InlineKeyboardButton(text='5', callback_data='ReviewMark_5')
     button_mark.row(mark1, mark2, mark3, mark4, mark5)
     button_mark.add((InlineKeyboardButton(text='Изменить урок', callback_data='feedback')))
-    button_mark.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
+    button_mark.add((InlineKeyboardButton(text='🏠 В меню', callback_data='menu')))
     await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                 text=f'Урок: {lesson_name} \nПоставьте оценку от 1 до 5:', reply_markup=button_mark)
 
@@ -102,7 +102,7 @@ async def review(callback: types.CallbackQuery, state: FSMContext):
     button_review = InlineKeyboardMarkup()
     button_review.add((InlineKeyboardButton(text='Отправить без отзыва', callback_data='SendReview')))
     button_review.add((InlineKeyboardButton(text='Изменить оценку', callback_data='LessonNum')))
-    button_review.add((InlineKeyboardButton(text='Отмена', callback_data='menu')))
+    button_review.add((InlineKeyboardButton(text='🏠 В меню', callback_data='menu')))
     message_edit = await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                                  text=f"Вы поставили оценку {mark_id} \nНапишите отзыв:",
                                                  reply_markup=button_review)
