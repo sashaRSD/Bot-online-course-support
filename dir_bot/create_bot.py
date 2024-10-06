@@ -6,5 +6,5 @@ config = configparser.ConfigParser()
 config.read("dir_bot/config.ini")
 storage = MemoryStorage()
 
-bot = Bot(token=config["TOKEN"]["token_telegramTEST"])
+bot = Bot(token=config["TOKEN"]["token_telegram"])
 dp = Dispatcher(bot, storage=storage)

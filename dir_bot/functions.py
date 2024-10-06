@@ -32,11 +32,11 @@ async def menu(username, call_menu_user_id, message_id=0):
 
 
 async def authority_student(my_username, my_id):
+    if 460325052 == my_id:
+        return -1
     num_student = await get_num_student(my_username, my_id)
     if num_student != -1:
         authority = await get_col_authority()
-        # if 460325052 == my_id:
-        #     return -1
         if len(authority)-1 >= num_student and authority[num_student]:
             return authority[num_student].split(" ")
         else:
