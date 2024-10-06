@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from dir_google.sheet_myprogress import get_col_authority, get_col_student
-from dir_google.sheet_last_or_next_lesson import get_lessons_inf
+from dir_google.sheet_lessons import get_all_lessons_inf
 from dir_bot.create_bot import bot
 from datetime import datetime
 
@@ -8,9 +8,10 @@ from datetime import datetime
 async def menu(username, call_menu_user_id, message_id=0):
     authority_tmp = await authority_student(username, call_menu_user_id)
     if authority_tmp:
+        last_lesson = await last_lesson_index()
         button_menu = InlineKeyboardMarkup() \
-            .add(InlineKeyboardButton(text='Следующий урок.', callback_data=await last_or_next(next_lesson=1))) \
-            .add(InlineKeyboardButton(text='Предыдущий урок.', callback_data=await last_or_next(next_lesson=0))) \
+            .add(InlineKeyboardButton(text='Следующий урок.', callback_data=f'lesson_index_{last_lesson+1}')) \
+            .add(InlineKeyboardButton(text='Предыдущий урок.', callback_data=f'lesson_index_{last_lesson}')) \
             .add(InlineKeyboardButton(text='Получить расписание занятий.', callback_data='schedule')) \
             .add(InlineKeyboardButton(text='Получить информацию о занятиях.', callback_data='lessons')) \
             .add(InlineKeyboardButton(text='Получить информацию о домашних заданиях.', callback_data='homeworks')) \
@@ -57,14 +58,14 @@ async def google_api_error(user_id_error):
                                           'Напишите администратору, если ошибка не уходит!')
 
 
-async def last_or_next(next_lesson):
-    lessons_mass = await get_lessons_inf()
+async def last_lesson_index():
+    lessons_mass = await get_all_lessons_inf()
     i_last_lesson = await match_datatime(lessons_mass[1], lessons_mass[2])
     if i_last_lesson != 0 and i_last_lesson != -1:
         i_last_lesson -= 1
     for i_name_lesson, name_lesson in enumerate(lessons_mass[3], 2):
         if name_lesson == lessons_mass[0][i_last_lesson]:
-            return f'lessons_num_{i_name_lesson+next_lesson}'
+            return i_name_lesson
 
 
 async def match_datatime(lessons_date, lessons_time):

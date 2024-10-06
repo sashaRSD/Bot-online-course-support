@@ -18,7 +18,7 @@ async def menu_module(callback: types.CallbackQuery):
             button_module = InlineKeyboardMarkup()
             for i, name in enumerate(module_name, 1):
                 if authority == -1 or str(i) in authority:
-                    button_module.add((InlineKeyboardButton(text=name, callback_data=f'lessons_module_{i - 1}')))
+                    button_module.add((InlineKeyboardButton(text=name, callback_data=f'lesson_module_{i - 1}')))
             button_module.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
             await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                         text='<b>🗂 Информация о занятиях </b>',
@@ -27,7 +27,7 @@ async def menu_module(callback: types.CallbackQuery):
         await google_api_error(user_id)
 
 
-@dp.callback_query_handler(lambda name: 'lessons_module' in name.data)
+@dp.callback_query_handler(lambda name: 'lesson_module' in name.data)
 async def menu_lessons(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     index_module_name = int(callback.data.split("_")[2])
@@ -37,7 +37,7 @@ async def menu_lessons(callback: types.CallbackQuery):
         button_lessons = InlineKeyboardMarkup()
         for i, name in enumerate(module_inf[1], 1):
             button_lessons.add((InlineKeyboardButton(text=f'{i}. {name}',
-                                                     callback_data=f'lessons_name_{index_module_name}_{i}')))
+                                                     callback_data=f'lesson_num_{index_module_name}_{i}')))
         button_lessons.add((InlineKeyboardButton(text='Назад', callback_data=f'lessons')))
         button_lessons.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
@@ -46,15 +46,22 @@ async def menu_lessons(callback: types.CallbackQuery):
         await google_api_error(user_id)
 
 
-@dp.callback_query_handler(lambda name: 'lessons_name' in name.data)
+@dp.callback_query_handler(lambda name: ('lesson_num' in name.data) or 'lesson_index' in name.data)
 async def get_lesson(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    index_module = int(callback.data.split("_")[2])
-    index_lesson = int(callback.data.split("_")[3])
-    index_module_global = (await get_modules(is_name=0))[index_module]
+    menu_cansel = InlineKeyboardMarkup()
+    if "lesson_num" in callback.data:
+        index_module = int(callback.data.split("_")[2])
+        index_lesson = int(callback.data.split("_")[3])
+        index_module_global = await get_modules(is_name=0)
+        index_lesson_global = index_module_global[index_module]+index_lesson+2
+        menu_cansel.add((InlineKeyboardButton(text='Назад', callback_data=f'lesson_module_{index_module}')))
+        menu_cansel.add((InlineKeyboardButton(text='В модули', callback_data=f'lessons')))
+    else:
+        index_lesson_global = int(callback.data.split("_")[2])
     # await callback.answer()
     try:
-        row_lesson = await get_lesson_data(index_module_global+index_lesson+2)
+        row_lesson = await get_lesson_data(index_lesson_global)
         if len(row_lesson) >= 8 and row_lesson[7]:
             teacher = row_lesson[7]
         else:
@@ -65,11 +72,7 @@ async def get_lesson(callback: types.CallbackQuery):
                        f'Цель: {row_lesson[3]}\n\n'
                        f'Описание:\n\n {row_lesson[4]}\n\n'
                        f'Материалы: {row_lesson[5]}</i>\n')
-        menu_cansel = (InlineKeyboardMarkup()
-                       .add((InlineKeyboardButton(text='Назад',
-                                                  callback_data=f'lessons_module_{index_module}')))
-                       .add((InlineKeyboardButton(text='В модули', callback_data=f'lessons')))
-                       .add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu'))))
+        menu_cansel.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
                                     text=f"{data_lesson}",
                                     parse_mode='HTML', disable_web_page_preview=True, reply_markup=menu_cansel)
