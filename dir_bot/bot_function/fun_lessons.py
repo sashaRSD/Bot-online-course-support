@@ -30,14 +30,15 @@ async def menu_module(callback: types.CallbackQuery):
 @dp.callback_query_handler(lambda name: 'lesson_module' in name.data)
 async def menu_lessons(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    index_module_name = int(callback.data.split("_")[2])
+    index_module = int(callback.data.split("_")[2])
     # await callback.answer()
     try:
-        module_inf = await get_module_inf(index_module_name)
+        module_inf = await get_module_inf(index_module)
         button_lessons = InlineKeyboardMarkup()
+        lesson_in_module = len(module_inf[1])
         for i, name in enumerate(module_inf[1], 1):
             button_lessons.add((InlineKeyboardButton(text=f'{i}. {name}',
-                                                     callback_data=f'lesson_num_{index_module_name}_{i}')))
+                                                     callback_data=f'lesson_num_{index_module}_{lesson_in_module}_{i}')))
         button_lessons.add((InlineKeyboardButton(text='Назад', callback_data=f'lessons')))
         button_lessons.add((InlineKeyboardButton(text='В меню', callback_data='back_to_menu')))
         await bot.edit_message_text(chat_id=user_id, message_id=callback.message.message_id,
@@ -53,15 +54,19 @@ async def get_lesson(callback: types.CallbackQuery):
     index_modules_global = await get_modules_index()
     if "lesson_num" in callback.data:
         index_module = int(callback.data.split("_")[2])
-        index_lesson = int(callback.data.split("_")[3])
+        lesson_in_module = int(callback.data.split("_")[3])
+        index_lesson = int(callback.data.split("_")[4])
         index_lesson_global = index_modules_global[index_module]+index_lesson+2
+        if index_lesson != lesson_in_module:
+            menu_cansel.add((InlineKeyboardButton(text='Следующий урок',
+                                                  callback_data=f'lesson_num_{index_module}_{lesson_in_module}_{index_lesson+1}')))
+        if index_lesson != 1:
+            menu_cansel.add((InlineKeyboardButton(text='Предыдущий урок',
+                                                  callback_data=f'lesson_num_{index_module}_{lesson_in_module}_{index_lesson-1}')))
         menu_cansel.add((InlineKeyboardButton(text='Назад', callback_data=f'lesson_module_{index_module}')))
         menu_cansel.add((InlineKeyboardButton(text='В модули', callback_data=f'lessons')))
     else:
         index_lesson_global = int(callback.data.split("_")[2])
-        i_module_max = [i for i, i_modules in enumerate(index_modules_global) if i_modules > index_lesson_global][0]
-        i_module_min = i_module_max - 1
-
     # await callback.answer()
     try:
         row_lesson = await get_lesson_data(index_lesson_global)
