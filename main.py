@@ -70,8 +70,7 @@ async def menu_callback_all(callback: types.CallbackQuery):
 
 @dp.errors_handler(exception=MessageCantBeDeleted)
 async def error_delete_2day(update, exception: MessageCantBeDeleted):
-    print(update)
-    chat_id = update['callback_query']['from']['id']
+    chat_id = update['callback_query']['message']['chat']['id']
     message_id = update['callback_query']['message']['message_id']
     await bot.edit_message_text(text='<< Меню обновлено >>', chat_id=chat_id, message_id=message_id)
     username = update['callback_query']['message']['chat']['username']
